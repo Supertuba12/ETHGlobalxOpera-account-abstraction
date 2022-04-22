@@ -4,7 +4,7 @@ node_modules
 cache
 artifacts
 /.idea/
-/typechain/
+*/typechain/
 /dist/
 /yarn-error.log
 /deployments/dev/

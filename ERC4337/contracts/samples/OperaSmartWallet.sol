@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
   *  has execute, eth handling methods
   *  has a single signer that can send requests through the entryPoint.
   */
-contract SimpleWallet is BaseWallet {
+contract OperaSmartWallet is BaseWallet {
     using ECDSA for bytes32;
     using UserOperationLib for UserOperation;
 
