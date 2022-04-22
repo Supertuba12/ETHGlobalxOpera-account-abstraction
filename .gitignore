@@ -1,9 +1,18 @@
 node_modules
 
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+/.idea/
+
 #Hardhat files
 cache
 artifacts
-/.idea/
 */typechain/
 /dist/
 /yarn-error.log
@@ -16,3 +25,24 @@ artifacts
 /coverage.json
 /.DS_Store
 .env
+
+# webapp
+
+# Logs
+webapp/logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+webapp/node_modules
+.DS_Store
+webapp/dist
+dist-ssr
+coverage
+*.local
+
+webapp/cypress/videos/
+webapp/cypress/screenshots/
