@@ -3,6 +3,8 @@ pragma solidity ^0.8.12;
 
 import "../BaseWallet.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol";
+import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 
 /**
   * minimal wallet.
@@ -10,13 +12,15 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
   *  has execute, eth handling methods
   *  has a single signer that can send requests through the entryPoint.
   */
-contract OperaSmartWallet is BaseWallet {
+contract OperaSmartWallet is BaseWallet, IERC1271, AccessControlEnumerableUpgradeable {
     using ECDSA for bytes32;
     using UserOperationLib for UserOperation;
 
     //explicit sizes of nonce, to fit a single storage cell with "owner"
     uint96 private _nonce;
     address public owner;
+    bytes32 public OWNER_ROLE; // solhint-disable-line var-name-mixedcase
+    bytes32 public GUARDIAN_ROLE; // solhint-disable-line var-name-mixedcas
 
     function nonce() public view virtual override returns (uint256) {
         return _nonce;
@@ -118,7 +122,7 @@ contract OperaSmartWallet is BaseWallet {
         (bool success, bytes memory result) = target.call{value : value}(data);
         if (!success) {
             assembly {
-                revert(add(result,32), mload(result))
+                revert(add(result, 32), mload(result))
             }
         }
     }
@@ -144,7 +148,15 @@ contract OperaSmartWallet is BaseWallet {
      * @param withdrawAddress target to send to
      * @param amount to withdraw
      */
-    function withdrawDepositTo(address payable withdrawAddress, uint256 amount) public onlyOwner{
+    function withdrawDepositTo(address payable withdrawAddress, uint256 amount) public onlyOwner {
         entryPoint().withdrawTo(withdrawAddress, amount);
+    }
+
+    function isValidSignature(bytes32 hash, bytes memory signature) public view returns (bytes4)    {
+        require(
+            hasRole(OWNER_ROLE, hash.recover(signature)),
+            "Wallet: Invalid signature"
+        );
+        return IERC1271.isValidSignature.selector;
     }
 }

@@ -2,7 +2,7 @@
 pragma solidity ^0.8.12;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "./SimpleWallet.sol";
+import "./OperaSmartWallet.sol";
 import "../BasePaymaster.sol";
 
 /**
@@ -35,7 +35,7 @@ contract TokenPaymaster is BasePaymaster, ERC20 {
 
     // known wallet construct we support the creation of.
     function _knownWallet() internal view virtual returns (bytes32) {
-        return keccak256(type(SimpleWallet).creationCode);
+        return keccak256(type(OperaSmartWallet).creationCode);
     }
 
     //helpers for owner, to mint and withdraw tokens.
