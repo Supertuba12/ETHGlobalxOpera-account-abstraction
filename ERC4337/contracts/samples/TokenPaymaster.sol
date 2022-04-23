@@ -4,7 +4,7 @@ pragma solidity ^0.8.12;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./OperaSmartWallet.sol";
 import "../BasePaymaster.sol";
-import "hardhat/console.sol";
+import "../UserOperation.sol";
 
 /**
  * A sample paymaster that define itself as a token to pay for gas.
@@ -91,12 +91,12 @@ contract TokenPaymaster is BasePaymaster, ERC20 {
 
     // when constructing a wallet, validate constructor code and parameters
     function _validateConstructor(UserOperation calldata userOp) internal virtual view {
-        bytes32 bytecodeHash = keccak256(userOp.initCode[0 : userOp.initCode.length - 64]);
+        bytes32 bytecodeHash = keccak256(userOp.initCode[0 : userOp.initCode.length - 160]);
         require(knownWallet == bytecodeHash, "TokenPaymaster: unknown wallet constructor");
 
         //verify the token constructor params:
-        // first param (of 2) should be our entryPoint
-        bytes32 entryPointParam = bytes32(userOp.initCode[userOp.initCode.length - 64 :]);
+        // first param (of 3) should be our entryPoint
+        bytes32 entryPointParam = bytes32(userOp.initCode[userOp.initCode.length - 160 :]);
         require(address(uint160(uint256(entryPointParam))) == address(entryPoint), "wrong entryPoint in constructor");
 
         //the 2nd parameter is the owner, but we don't need to validate it (it is done in validateUserOp)

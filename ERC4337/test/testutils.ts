@@ -88,8 +88,8 @@ export async function calcGasUsage(rcpt: ContractReceipt, entryPoint: EntryPoint
 }
 
 //helper function to create a constructor call to our wallet.
-export function WalletConstructor(entryPoint: string, owner: string): BytesLike {
-  return new OperaSmartWallet__factory().getDeployTransaction(entryPoint, owner).data!
+export function WalletConstructor(entryPoint: string, owner: string, guardians: string[]): BytesLike {
+  return new OperaSmartWallet__factory().getDeployTransaction(entryPoint, owner, guardians).data!
 }
 
 const panicCodes: { [key: string]: any } = {

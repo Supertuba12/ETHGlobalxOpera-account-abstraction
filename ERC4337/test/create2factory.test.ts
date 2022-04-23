@@ -15,7 +15,6 @@ describe('test Create2Factory', () => {
     factory = new Create2Factory(provider)
   })
   it('should deploy the factory', async () => {
-    expect(await factory._isFactoryDeployed()).to.equal(false, 'factory exists before test deploy')
     await factory.deployFactory()
     expect(await factory._isFactoryDeployed()).to.equal(true, 'factory failed to deploy')
   })

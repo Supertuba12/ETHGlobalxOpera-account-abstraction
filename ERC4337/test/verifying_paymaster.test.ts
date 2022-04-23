@@ -25,6 +25,7 @@ describe("EntryPoint with VerifyingPaymaster", function () {
   let ethersSigner = ethers.provider.getSigner();
   let wallet: OperaSmartWallet
   let offchainSigner: Wallet
+  let guardians: string[]
 
   let paymaster: VerifyingPaymaster
   before(async function () {
@@ -34,11 +35,13 @@ describe("EntryPoint with VerifyingPaymaster", function () {
 
     offchainSigner = createWalletOwner()
     walletOwner = createWalletOwner()
+    let accounts = await ethers.provider.listAccounts()
+    guardians = [accounts[1]]
 
     paymaster = await new VerifyingPaymaster__factory(ethersSigner).deploy(entryPoint.address, offchainSigner.address)
     paymaster.addStake(0, {value: parseEther('2')})
     entryPoint.depositTo(paymaster.address, {value: parseEther('1')})
-    wallet = await new OperaSmartWallet__factory(ethersSigner).deploy(entryPoint.address, walletOwner.address)
+    wallet = await new OperaSmartWallet__factory(ethersSigner).deploy(entryPoint.address, walletOwner.address, guardians)
 
   })
 
@@ -51,7 +54,7 @@ describe("EntryPoint with VerifyingPaymaster", function () {
       }, walletOwner, entryPoint)
       await expect(entryPointStatic.callStatic.simulateValidation(userOp)).to.be.revertedWith('invalid signature length in paymasterData')
     });
-    
+
     it('should reject on invalid signature', async () => {
       const userOp = await fillAndSign({
         sender: wallet.address,

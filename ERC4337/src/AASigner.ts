@@ -228,7 +228,7 @@ export class AASigner extends Signer {
   async _deploymentTransaction(): Promise<BytesLike> {
     let ownerAddress = await this.signer.getAddress();
     return new OperaSmartWallet__factory()
-      .getDeployTransaction(this.entryPoint.address, ownerAddress).data!
+      .getDeployTransaction(this.entryPoint.address, ownerAddress, []).data!
   }
 
   async getAddress(): Promise<string> {

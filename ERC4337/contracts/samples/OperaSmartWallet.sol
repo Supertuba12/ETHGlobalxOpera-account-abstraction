@@ -5,6 +5,7 @@ import "../BaseWallet.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol";
 import "@openzeppelin/contracts/interfaces/IERC1271.sol";
+import "hardhat/console.sol";
 
 /**
   * minimal wallet.
@@ -30,15 +31,28 @@ contract OperaSmartWallet is BaseWallet, IERC1271, AccessControlEnumerableUpgrad
         return _entryPoint;
     }
 
+    modifier onlyEntryPoint() {
+        require(msg.sender == entryPoint().create2factory(), "Wallet: Not from EntryPoint");
+        _;
+    }
+
     EntryPoint private _entryPoint;
 
     event EntryPointChanged(address indexed oldEntryPoint, address indexed newEntryPoint);
 
     receive() external payable {}
 
-    constructor(EntryPoint anEntryPoint, address anOwner) {
+    constructor(EntryPoint anEntryPoint, address anOwner, address[] memory _guardians) {
         _entryPoint = anEntryPoint;
         owner = anOwner;
+
+        OWNER_ROLE = keccak256("OWNER_ROLE");
+        GUARDIAN_ROLE = keccak256("GUARDIAN_ROLE");
+        _setRoleAdmin(GUARDIAN_ROLE, OWNER_ROLE);
+        _grantRole(OWNER_ROLE, anOwner);
+        for (uint256 i = 0; i < _guardians.length; i++) {
+            _grantRole(GUARDIAN_ROLE, _guardians[i]);
+        }
     }
 
     modifier onlyOwner() {
@@ -150,6 +164,37 @@ contract OperaSmartWallet is BaseWallet, IERC1271, AccessControlEnumerableUpgrad
      */
     function withdrawDepositTo(address payable withdrawAddress, uint256 amount) public onlyOwner {
         entryPoint().withdrawTo(withdrawAddress, amount);
+    }
+
+    function getOwnerCount() external view returns (uint256) {
+        return getRoleMemberCount(OWNER_ROLE);
+    }
+
+    function getOwner(uint256 index) external view returns (address) {
+        return getRoleMember(OWNER_ROLE, index);
+    }
+
+    function getGuardianCount() external view returns (uint256) {
+        return getRoleMemberCount(GUARDIAN_ROLE);
+    }
+
+    function getGuardian(uint256 index) external view returns (address) {
+        return getRoleMember(GUARDIAN_ROLE, index);
+    }
+
+    function grantGuardian(address guardian) external onlyEntryPoint {
+        require(!hasRole(OWNER_ROLE, guardian), "Wallet: Owner cannot be guardian");
+        _grantRole(GUARDIAN_ROLE, guardian);
+        console.log("grant guardian ", guardian);
+    }
+
+    function revokeGuardian(address guardian) external onlyEntryPoint {
+        _revokeRole(GUARDIAN_ROLE, guardian);
+    }
+
+    function transferOwner(address newOwner) external onlyEntryPoint {
+        _revokeRole(OWNER_ROLE, getRoleMember(OWNER_ROLE, 0));
+        _grantRole(OWNER_ROLE, newOwner);
     }
 
     function isValidSignature(bytes32 hash, bytes memory signature) public view returns (bytes4)    {

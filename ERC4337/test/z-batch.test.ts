@@ -44,6 +44,7 @@ describe("Batch gas testing", function () {
   let testUtil: TestUtil
   let walletOwner: Wallet
   let wallet: OperaSmartWallet
+  let guardians: string[]
 
   let results: (() => void)[] = []
   before(async function () {
@@ -55,7 +56,10 @@ describe("Batch gas testing", function () {
     //static call must come from address zero, to validate it can only be called off-chain.
     entryPointView = entryPoint.connect(ethers.provider.getSigner(AddressZero))
     walletOwner = createWalletOwner()
-    wallet = await new OperaSmartWallet__factory(ethersSigner).deploy(entryPoint.address, await walletOwner.getAddress())
+    let accounts = await ethers.provider.listAccounts()
+    guardians = [accounts[1]]
+
+    wallet = await new OperaSmartWallet__factory(ethersSigner).deploy(entryPoint.address, await walletOwner.getAddress(), guardians)
     await fund(wallet)
   })
 
@@ -101,10 +105,10 @@ describe("Batch gas testing", function () {
         let opsGasCollected = 0
         while (++count) {
           const walletOwner1 = createWalletOwner()
-          const wallet1 = await entryPoint.getSenderAddress(WalletConstructor(entryPoint.address, walletOwner1.address), 0)
+          const wallet1 = await entryPoint.getSenderAddress(WalletConstructor(entryPoint.address, walletOwner1.address, guardians), 0)
           await fund(wallet1, '0.5')
           const op1 = await fillAndSign({
-            initCode: WalletConstructor(entryPoint.address, walletOwner1.address),
+            initCode: WalletConstructor(entryPoint.address, walletOwner1.address, guardians),
             nonce: 0,
             // callData: walletExecCounterFromEntryPoint.data,
             maxPriorityFeePerGas: 1e9,
