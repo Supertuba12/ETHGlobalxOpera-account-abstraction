@@ -1,4 +1,3 @@
-import axios from "axios";
 import { net } from "./index";
 import type { AxiosResponse } from "axios";
 
@@ -8,7 +7,7 @@ class UserService {
       return Promise.reject("User input is not valid");
     }
 
-    return axios.post("addUser", {
+    return net.post("/addUser", {
       username: username,
       password: password,
     });
@@ -19,7 +18,7 @@ class UserService {
       return Promise.reject("User input is not valid");
     }
 
-    return net.post("login", {
+    return net.post("/login", {
       username: username,
       password: password,
     });
