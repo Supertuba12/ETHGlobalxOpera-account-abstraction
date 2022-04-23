@@ -1,9 +1,10 @@
 const router = require('express').Router();
 
-const addUser = require('./api/addUser.js')
-const findUser = require('./api/findUser.js')
+const user = require('./api/user.js')
 
-router.post('/api/addUser', addUser.addUser)
-router.get('/api/findUser', findUser.findUser)
+router.post('/api/addUser', user.addUser)
+router.post('/api/addGuardian', user.addGuardian)
+router.get('/api/findUser', user.findUser)
+
 
 module.exports = router

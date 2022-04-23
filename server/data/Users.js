@@ -2,11 +2,21 @@ class Users {
  constructor(db) {
   this.collection = db.collection('walletDb');
  }
- async addUser(user) {
-  return await this.collection.insertOne(user);
+ async addUser(userInfo) {
+  return await this.collection.insertOne(userInfo);
  }
- async findUser(user) {
-  return await this.collection.find(user);
+ async findUser(userInfo) {
+  return await this.collection.find(userInfo);
+ }
+ async addGuardian(userInfo) {
+  return await this.collection.updateOne(
+   {username: userInfo.username},
+   {
+    $set: {guardians: userInfo.guardians},
+    $currentDate: {lastModified: true}
+   }
+  )
  }
 }
+
 module.exports = Users;

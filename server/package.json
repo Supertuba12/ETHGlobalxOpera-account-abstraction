@@ -9,6 +9,7 @@
     "dev": "nodemon ./server.js localhost 3080"
   },
   "dependencies": {
+    "ethers": "^5.6.4",
     "express": "^4.17.1",
     "http-proxy-middleware": "^1.0.4",
     "mongodb": "^4.5.0"
