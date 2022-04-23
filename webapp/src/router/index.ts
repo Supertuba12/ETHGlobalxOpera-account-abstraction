@@ -23,13 +23,24 @@ const router = createRouter({
       name: "onboarding",
       component: () => import("../views/OnboardingView.vue"),
     },
+    {
+      path: "/guardians",
+      name: "guardians",
+      component: () => import("../views/GuardiansView.vue"),
+    },
   ],
 });
 
 // Guard routes, such that new users land on onboarding
 router.beforeEach(async (to, from, next) => {
-  if (store.state.isNewUser && to.path !== "/onboarding") {
+  if (store.getters.isNewUser && to.path !== "/onboarding") {
     next("/onboarding");
+  } else if (
+    store.getters.currentUser !== "" &&
+    store.getters.guardians.length === 0 &&
+    to.path !== "/guardians"
+  ) {
+    next("/guardians");
   } else {
     next();
   }
