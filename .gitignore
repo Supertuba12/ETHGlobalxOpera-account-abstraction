@@ -11,15 +11,13 @@ node_modules
 /.idea/
 
 #Hardhat files
-cache
-artifacts
-*/typechain/
-/dist/
+**/cache
+**/artifacts
+**/typechain/
+**/dist/
 /yarn-error.log
-/deployments/dev/
-/deployments/localhost/
-/deployments/proxy/
-/typechain-types/
+**/deployments/
+**/typechain-types/
 /reports/gas-used-output.color
 /coverage
 /coverage.json

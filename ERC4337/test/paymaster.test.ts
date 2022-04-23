@@ -3,8 +3,8 @@ import {BigNumber, Wallet} from "ethers";
 import {ethers} from "hardhat";
 import {expect} from "chai";
 import {
-  SimpleWallet,
-  SimpleWallet__factory,
+  OperaSmartWallet,
+  OperaSmartWallet__factory,
   EntryPoint,
   TestUtil,
   TestUtil__factory,
@@ -31,7 +31,7 @@ describe("EntryPoint with paymaster", function () {
   let testUtil: TestUtil
   let walletOwner: Wallet
   let ethersSigner = ethers.provider.getSigner();
-  let wallet: SimpleWallet
+  let wallet: OperaSmartWallet
   let beneficiaryAddress = '0x'.padEnd(42, '1')
 
   before(async function () {
@@ -41,7 +41,7 @@ describe("EntryPoint with paymaster", function () {
     entryPoint = await deployEntryPoint(100, 10)
 
     walletOwner = createWalletOwner()
-    wallet = await new SimpleWallet__factory(ethersSigner).deploy(entryPoint.address, await walletOwner.getAddress())
+    wallet = await new OperaSmartWallet__factory(ethersSigner).deploy(entryPoint.address, await walletOwner.getAddress())
     await fund(wallet)
   })
 
@@ -169,10 +169,10 @@ describe("EntryPoint with paymaster", function () {
         const execFromSingleton = wallet.interface.encodeFunctionData('execFromEntryPoint', [testCounter.address, 0, justEmit])
 
         let ops: UserOperation[] = []
-        let wallets: SimpleWallet[] = []
+        let wallets: OperaSmartWallet[] = []
 
         for (let i = 0; i < 4; i++) {
-          const aWallet = await new SimpleWallet__factory(ethersSigner).deploy(entryPoint.address, await walletOwner.getAddress())
+          const aWallet = await new OperaSmartWallet__factory(ethersSigner).deploy(entryPoint.address, await walletOwner.getAddress())
           await paymaster.mintTokens(aWallet.address, parseEther('1'))
           const op = await fillAndSign({
             sender: aWallet.address,
@@ -201,10 +201,10 @@ describe("EntryPoint with paymaster", function () {
       // but the execution of wallet1 drains wallet2.
       // as a result, the postOp of the paymaster reverts, and cause entire handleOp to revert.
       describe('grief attempt', () => {
-        let wallet2: SimpleWallet
+        let wallet2: OperaSmartWallet
         let approveCallData: string
         before(async () => {
-          wallet2 = await new SimpleWallet__factory(ethersSigner).deploy(entryPoint.address, await walletOwner.getAddress())
+          wallet2 = await new OperaSmartWallet__factory(ethersSigner).deploy(entryPoint.address, await walletOwner.getAddress())
           await paymaster.mintTokens(wallet2.address, parseEther('1'))
           await paymaster.mintTokens(wallet.address, parseEther('1'))
           approveCallData = paymaster.interface.encodeFunctionData('approve', [wallet.address, ethers.constants.MaxUint256])

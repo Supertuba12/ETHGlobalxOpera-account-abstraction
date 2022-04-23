@@ -2,7 +2,7 @@ import {BigNumber, Bytes, ethers, Signer} from "ethers";
 import {BaseProvider, Provider, TransactionRequest} from "@ethersproject/providers";
 import {Event} from 'ethers'
 import {Deferrable, resolveProperties} from "@ethersproject/properties";
-import {SimpleWallet, SimpleWallet__factory, EntryPoint, EntryPoint__factory} from "../typechain";
+import {OperaSmartWallet, OperaSmartWallet__factory, EntryPoint, EntryPoint__factory} from "../typechain";
 import {BytesLike, hexValue} from "@ethersproject/bytes";
 import {TransactionResponse} from "@ethersproject/abstract-provider";
 import {fillAndSign, getRequestId} from "../test/UserOp";
@@ -189,7 +189,7 @@ export class AAProvider extends BaseProvider {
  * a signer that wraps account-abstraction.
  */
 export class AASigner extends Signer {
-  _wallet?: SimpleWallet
+  _wallet?: OperaSmartWallet
 
   private _isPhantom = true
   public entryPoint: EntryPoint
@@ -217,7 +217,7 @@ export class AASigner extends Signer {
     if (await this.provider!.getCode(address).then(code => code.length) <= 2) {
       throw new Error('cannot connect to non-existing contract')
     }
-    this._wallet = SimpleWallet__factory.connect(address, this.signer)
+    this._wallet = OperaSmartWallet__factory.connect(address, this.signer)
     this._isPhantom = false;
   }
 
@@ -227,7 +227,7 @@ export class AASigner extends Signer {
 
   async _deploymentTransaction(): Promise<BytesLike> {
     let ownerAddress = await this.signer.getAddress();
-    return new SimpleWallet__factory()
+    return new OperaSmartWallet__factory()
       .getDeployTransaction(this.entryPoint.address, ownerAddress).data!
   }
 
@@ -244,7 +244,7 @@ export class AASigner extends Signer {
     throw new Error('signMessage: unsupported by AA')
   }
 
-  async getWallet(): Promise<SimpleWallet> {
+  async getWallet(): Promise<OperaSmartWallet> {
 
     await this.syncAccount()
     return this._wallet!
@@ -334,7 +334,7 @@ export class AASigner extends Signer {
   async syncAccount() {
     if (!this._wallet) {
       const address = await this.entryPoint.getSenderAddress(await this._deploymentTransaction(), this.index)
-      this._wallet = SimpleWallet__factory.connect(address, this.signer)
+      this._wallet = OperaSmartWallet__factory.connect(address, this.signer)
     }
 
     this._chainId = this.provider?.getNetwork().then(net=>net.chainId)

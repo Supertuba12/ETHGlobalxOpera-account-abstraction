@@ -3,8 +3,8 @@ import {describe} from 'mocha'
 import {BigNumber, Wallet} from "ethers";
 import {expect} from "chai";
 import {
-  SimpleWallet,
-  SimpleWallet__factory,
+  OperaSmartWallet,
+  OperaSmartWallet__factory,
   EntryPoint,
   TestCounter,
   TestCounter__factory,
@@ -44,7 +44,7 @@ describe("EntryPoint", function () {
   let walletOwner: Wallet
   let ethersSigner = ethers.provider.getSigner();
   let signer: string
-  let wallet: SimpleWallet
+  let wallet: OperaSmartWallet
 
   const globalUnstakeDelaySec = 2
   const paymasterStake = ethers.utils.parseEther('2')
@@ -62,7 +62,7 @@ describe("EntryPoint", function () {
     //static call must come from address zero, to validate it can only be called off-chain.
     entryPointView = entryPoint.connect(ethers.provider.getSigner(AddressZero))
     walletOwner = createWalletOwner()
-    wallet = await new SimpleWallet__factory(ethersSigner).deploy(entryPoint.address, await walletOwner.getAddress())
+    wallet = await new OperaSmartWallet__factory(ethersSigner).deploy(entryPoint.address, await walletOwner.getAddress())
     await fund(wallet)
 
     //sanity: validate helper functions
@@ -200,10 +200,10 @@ describe("EntryPoint", function () {
     })
     describe('with deposit', () => {
       let owner: string
-      let wallet: SimpleWallet
+      let wallet: OperaSmartWallet
       before(async () => {
         owner = await ethersSigner.getAddress()
-        wallet = await new SimpleWallet__factory(ethersSigner).deploy(entryPoint.address, owner)
+        wallet = await new OperaSmartWallet__factory(ethersSigner).deploy(entryPoint.address, owner)
         await wallet.addDeposit({value: ONE_ETH})
         expect(await getBalance(wallet.address)).to.equal(0)
         expect(await wallet.getDeposit()).to.eql(ONE_ETH)
@@ -217,10 +217,10 @@ describe("EntryPoint", function () {
 
   describe('#simulateValidation', () => {
     const walletOwner1 = createWalletOwner()
-    let wallet1: SimpleWallet
+    let wallet1: OperaSmartWallet
 
     before(async () => {
-      wallet1 = await new SimpleWallet__factory(ethersSigner).deploy(entryPoint.address, await walletOwner1.getAddress())
+      wallet1 = await new OperaSmartWallet__factory(ethersSigner).deploy(entryPoint.address, await walletOwner1.getAddress())
     })
 
     it('should fail if validateUserOp fails', async () => {
@@ -501,7 +501,7 @@ describe("EntryPoint", function () {
       const walletOwner1 = createWalletOwner()
       let wallet1: string
       let walletOwner2 = createWalletOwner()
-      let wallet2: SimpleWallet
+      let wallet2: OperaSmartWallet
       let prebalance1: BigNumber
       let prebalance2: BigNumber
 
@@ -510,7 +510,7 @@ describe("EntryPoint", function () {
         const count = await counter.populateTransaction.count()
         walletExecCounterFromEntryPoint = await wallet.populateTransaction.execFromEntryPoint(counter.address, 0, count.data!)
         wallet1 = await entryPoint.getSenderAddress(WalletConstructor(entryPoint.address, walletOwner1.address), 0)
-        wallet2 = await new SimpleWallet__factory(ethersSigner).deploy(entryPoint.address, walletOwner2.address)
+        wallet2 = await new OperaSmartWallet__factory(ethersSigner).deploy(entryPoint.address, walletOwner2.address)
         await fund(wallet1)
         await fund(wallet2.address)
         //execute and incremtn counter
@@ -554,7 +554,7 @@ describe("EntryPoint", function () {
     let paymaster: TestPaymasterAcceptAll
     let counter: TestCounter
     let walletExecFromEntryPoint: PopulatedTransaction
-    let wallet2: SimpleWallet
+    let wallet2: OperaSmartWallet
     const wallet2Owner = createWalletOwner()
 
     before(async () => {

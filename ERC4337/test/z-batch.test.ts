@@ -3,8 +3,8 @@ import {describe} from 'mocha'
 import {Wallet} from "ethers";
 import {expect} from "chai";
 import {
-  SimpleWallet,
-  SimpleWallet__factory,
+  OperaSmartWallet,
+  OperaSmartWallet__factory,
   EntryPoint,
   TestCounter,
   TestCounter__factory,
@@ -43,7 +43,7 @@ describe("Batch gas testing", function () {
 
   let testUtil: TestUtil
   let walletOwner: Wallet
-  let wallet: SimpleWallet
+  let wallet: OperaSmartWallet
 
   let results: (() => void)[] = []
   before(async function () {
@@ -55,7 +55,7 @@ describe("Batch gas testing", function () {
     //static call must come from address zero, to validate it can only be called off-chain.
     entryPointView = entryPoint.connect(ethers.provider.getSigner(AddressZero))
     walletOwner = createWalletOwner()
-    wallet = await new SimpleWallet__factory(ethersSigner).deploy(entryPoint.address, await walletOwner.getAddress())
+    wallet = await new OperaSmartWallet__factory(ethersSigner).deploy(entryPoint.address, await walletOwner.getAddress())
     await fund(wallet)
   })
 

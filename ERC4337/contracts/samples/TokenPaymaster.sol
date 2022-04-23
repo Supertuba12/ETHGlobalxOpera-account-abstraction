@@ -4,6 +4,7 @@ pragma solidity ^0.8.12;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./OperaSmartWallet.sol";
 import "../BasePaymaster.sol";
+import "hardhat/console.sol";
 
 /**
  * A sample paymaster that define itself as a token to pay for gas.

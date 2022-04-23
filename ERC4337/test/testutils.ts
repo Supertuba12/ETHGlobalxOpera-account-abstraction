@@ -6,7 +6,7 @@ import {BytesLike} from "@ethersproject/bytes";
 import {
   EntryPoint,
   EntryPoint__factory,
-  SimpleWallet__factory
+  OperaSmartWallet__factory
 } from "../typechain";
 import {expect} from "chai";
 import {Create2Factory} from "../src/Create2Factory";
@@ -89,7 +89,7 @@ export async function calcGasUsage(rcpt: ContractReceipt, entryPoint: EntryPoint
 
 //helper function to create a constructor call to our wallet.
 export function WalletConstructor(entryPoint: string, owner: string): BytesLike {
-  return new SimpleWallet__factory().getDeployTransaction(entryPoint, owner).data!
+  return new OperaSmartWallet__factory().getDeployTransaction(entryPoint, owner).data!
 }
 
 const panicCodes: { [key: string]: any } = {

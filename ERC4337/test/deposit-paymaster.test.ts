@@ -3,8 +3,8 @@ import {describe} from 'mocha'
 import {ethers} from "hardhat";
 import {expect} from "chai";
 import {
-  SimpleWallet,
-  SimpleWallet__factory,
+  OperaSmartWallet,
+  OperaSmartWallet__factory,
   EntryPoint,
   DepositPaymaster,
   DepositPaymaster__factory,
@@ -47,10 +47,10 @@ describe("DepositPaymaster", async () => {
   })
 
   describe('deposit', () => {
-    let wallet: SimpleWallet
+    let wallet: OperaSmartWallet
 
     before(async () => {
-      wallet = await new SimpleWallet__factory(ethersSigner).deploy(entryPoint.address, await ethersSigner.getAddress())
+      wallet = await new OperaSmartWallet__factory(ethersSigner).deploy(entryPoint.address, await ethersSigner.getAddress())
     })
     it('should deposit and read balance', async () => {
       await paymaster.addDepositFor(token.address, wallet.address, 100)
@@ -82,13 +82,13 @@ describe("DepositPaymaster", async () => {
   })
 
   describe('#validatePaymasterUserOp', () => {
-    let wallet: SimpleWallet
+    let wallet: OperaSmartWallet
     const gasPrice = 1e9
     let walletOwner: string
 
     before(async () => {
       walletOwner = await ethersSigner.getAddress();
-      wallet = await new SimpleWallet__factory(ethersSigner).deploy(entryPoint.address, walletOwner)
+      wallet = await new OperaSmartWallet__factory(ethersSigner).deploy(entryPoint.address, walletOwner)
     })
 
     it('should fail if no token', async () => {
@@ -145,12 +145,12 @@ describe("DepositPaymaster", async () => {
     });
   })
   describe('#handleOps', () => {
-    let wallet: SimpleWallet
+    let wallet: OperaSmartWallet
     const walletOwner = createWalletOwner()
     let counter: TestCounter
     let callData: string
     before(async () => {
-      wallet = await new SimpleWallet__factory(ethersSigner).deploy(entryPoint.address, walletOwner.address)
+      wallet = await new OperaSmartWallet__factory(ethersSigner).deploy(entryPoint.address, walletOwner.address)
       counter = await new TestCounter__factory(ethersSigner).deploy()
       const counterJustEmit = await counter.populateTransaction.justemit().then(tx => tx.data!)
       callData = await wallet.populateTransaction.execFromEntryPoint(counter.address, 0, counterJustEmit).then(tx => tx.data!)

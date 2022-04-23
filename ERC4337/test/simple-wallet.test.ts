@@ -3,8 +3,8 @@ import {Wallet} from "ethers";
 import {ethers} from "hardhat";
 import {expect} from "chai";
 import {
-  SimpleWallet,
-  SimpleWallet__factory,
+  OperaSmartWallet,
+  OperaSmartWallet__factory,
   TestUtil,
   TestUtil__factory
 } from "../typechain";
@@ -16,7 +16,7 @@ import { Signature, SignatureLike } from '@ethersproject/bytes';
 import { ECDSASignature, ecrecover, ecsign } from 'ethereumjs-util';
 
 
-describe("SimpleWallet", function () {
+describe("OperaSmartWallet", function () {
 
   const entryPoint = '0x'.padEnd(42, '2')
   let accounts: string[]
@@ -51,12 +51,12 @@ describe("SimpleWallet", function () {
   }
 
   it('owner should be able to call transfer', async () => {
-    const wallet = await new SimpleWallet__factory(ethers.provider.getSigner()).deploy(entryPoint, accounts[0])
+    const wallet = await new OperaSmartWallet__factory(ethers.provider.getSigner()).deploy(entryPoint, accounts[0])
     await ethersSigner.sendTransaction({from: accounts[0], to: wallet.address, value: parseEther('2')})
     await wallet.transfer(accounts[2], ONE_ETH)
   });
   it('other account should not be able to call transfer', async () => {
-    const wallet = await new SimpleWallet__factory(ethers.provider.getSigner()).deploy(entryPoint, accounts[0])
+    const wallet = await new OperaSmartWallet__factory(ethers.provider.getSigner()).deploy(entryPoint, accounts[0])
     await expect(wallet.connect(ethers.provider.getSigner(1)).transfer(accounts[2], ONE_ETH))
       .to.be.revertedWith('only owner')
   });
@@ -68,7 +68,7 @@ describe("SimpleWallet", function () {
   });
 
   describe('#validateUserOp', () => {
-    let wallet: SimpleWallet
+    let wallet: OperaSmartWallet
     let userOp: UserOperation
     let requestId: string
     let preBalance: number
@@ -79,7 +79,7 @@ describe("SimpleWallet", function () {
     before(async () => {
       //that's the account of ethersSigner
       const entryPoint = accounts[2]
-      wallet = await new SimpleWallet__factory(await ethers.getSigner(entryPoint)).deploy(entryPoint, walletOwner.address)
+      wallet = await new OperaSmartWallet__factory(await ethers.getSigner(entryPoint)).deploy(entryPoint, walletOwner.address)
       await ethersSigner.sendTransaction({from: accounts[0], to: wallet.address, value: parseEther('0.2')})
       const callGas = 200000
       const verificationGas = 100000
