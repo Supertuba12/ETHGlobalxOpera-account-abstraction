@@ -9,7 +9,6 @@ import "./StakeManager.sol";
 import "./UserOperation.sol";
 import "./IWallet.sol";
 import "./IPaymaster.sol";
-
 import "./ICreate2Deployer.sol";
 
 contract EntryPoint is StakeManager {

@@ -5,7 +5,6 @@ import "../BaseWallet.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol";
 import "@openzeppelin/contracts/interfaces/IERC1271.sol";
-import "hardhat/console.sol";
 
 /**
   * minimal wallet.
@@ -182,17 +181,16 @@ contract OperaSmartWallet is BaseWallet, IERC1271, AccessControlEnumerableUpgrad
         return getRoleMember(GUARDIAN_ROLE, index);
     }
 
-    function grantGuardian(address guardian) external onlyEntryPoint {
+    function grantGuardian(address guardian) external onlyOwner() {
         require(!hasRole(OWNER_ROLE, guardian), "Wallet: Owner cannot be guardian");
         _grantRole(GUARDIAN_ROLE, guardian);
-        console.log("grant guardian ", guardian);
     }
 
-    function revokeGuardian(address guardian) external onlyEntryPoint {
+    function revokeGuardian(address guardian) external onlyOwner() {
         _revokeRole(GUARDIAN_ROLE, guardian);
     }
 
-    function transferOwner(address newOwner) external onlyEntryPoint {
+    function transferOwner(address newOwner) external onlyOwner() {
         _revokeRole(OWNER_ROLE, getRoleMember(OWNER_ROLE, 0));
         _grantRole(OWNER_ROLE, newOwner);
     }
